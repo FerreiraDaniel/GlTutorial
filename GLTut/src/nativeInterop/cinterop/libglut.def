@@ -1,0 +1,6 @@
+headers =  glut.h
+headerFilter = *
+
+
+compilerOpts.mingw = -I..\\OpenGL_Library\\mingwX64\\include\\GL
+linkerOpts.mingw = -L.\\..\\OpenGL_Library\\mingwX64\\lib -lfreeglut
