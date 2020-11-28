@@ -1,6 +1,5 @@
-package Tut_02_Playing_With_Colors
+package tut_02_playing_with_colors_vertex_colors
 
-import tut_02_playing_with_colors_vertex_colors.VertexColors
 import framework.Framework
 
 
