@@ -1,17 +1,23 @@
-package tut_02_playing_with_colors_vertex_colors
+package tut_03_opengls_moving_triangle
 
-import framework.*
+import framework.Framework
+import framework.ITutorial
+import framework.KeyboardKeys
+import framework.readUIntValue
 import kotlinx.cinterop.*
 import libgl.*
 import libglut.*
+import platform.posix.cosf
+import platform.posix.fmodf
+import platform.posix.sinf
 
 @ExperimentalUnsignedTypes
-class VertexColors : ITutorial {
+class CpuPositionOffset : ITutorial {
     private val resourcesFolderName = "resources"
-    private val folderName = "Tut 02 Playing with Colors"
+    private val folderName = "Tut 03 OpenGLs Moving Triangle"
     private val subFolderName = "data"
-    private val vertexShaderFileName = "VertexColors.vert"
-    private val fragmentShader = "VertexColors.frag"
+    private val vertexShaderFileName = "standard.vert"
+    private val fragmentShader = "standard.frag"
 
     var theProgram: GLuint = 0.toUInt()
 
@@ -42,49 +48,36 @@ class VertexColors : ITutorial {
 
     }
 
-    private val vertexData = cValuesOf(
+    private val vertexPositions = cValuesOf(
         0.0f, 0.5f, 0.0f, 1.0f,
         0.5f, -0.366f, 0.0f, 1.0f,
         -0.5f, -0.366f, 0.0f, 1.0f
     )
 
-    private val vertexData2 = cValuesOf(
-        1.0f, 0.0f, 0.0f, 1.0f,
-        0.0f, 1.0f, 0.0f, 1.0f,
-        0.0f, 0.0f, 1.0f, 1.0f
-    )
 
-
-    private var vertexBufferObject: GLuint = 0.toUInt()
-    private var vertexBufferObject2: GLuint = 0.toUInt()
+    private var positionBufferObject: GLuint = 0.toUInt()
     private var vao: GLuint = 0.toUInt()
 
-    private fun initializeVertexBuffer(vertexData: CValues<FloatVar>): GLuint {
-        var vertexBufferObject = readUIntValue {
+    private fun initializeVertexBuffer() {
+        positionBufferObject = readUIntValue {
             glGenBuffers!!(1, it)
         }
         val glArrayBuffer = GL_ARRAY_BUFFER.toUInt()
-        glBindBuffer!!(glArrayBuffer, vertexBufferObject)
+        glBindBuffer!!(glArrayBuffer, positionBufferObject)
         memScoped {
-            val vertexDataPointer = vertexData.getPointer(memScope)
-            val vertexDataSize =vertexData.size.toLong()
+            val vertexDataPointer = vertexPositions.getPointer(memScope)
+            val vertexDataSize = vertexPositions.size.toLong()
             glBufferData!!(glArrayBuffer, vertexDataSize, vertexDataPointer, GL_STATIC_DRAW.toUInt())
         }
 
         glBindBuffer!!(glArrayBuffer, 0.toUInt())
-
-        return vertexBufferObject
     }
 
-    private fun initializeVertexBuffers() {
-        vertexBufferObject = initializeVertexBuffer(vertexData)
-        vertexBufferObject2 = initializeVertexBuffer(vertexData2)
-    }
 
     //Called after the window and OpenGL are initialized. Called exactly once, before the main loop.
     override fun init() {
         initializeProgram()
-        initializeVertexBuffers()
+        initializeVertexBuffer()
 
         vao = readUIntValue {
             glGenVertexArrays!!(1, it)
@@ -94,34 +87,70 @@ class VertexColors : ITutorial {
         glBindVertexArray!!(vao)
     }
 
+
+    private fun computePositionOffsets(): Pair<Float, Float>
+    {
+        val fLoopDuration = 5.0f
+        val fScale = 3.14159f * 2.0f / fLoopDuration
+
+        val fElapsedTime = glutGet(GLUT_ELAPSED_TIME) / 1000.0f
+
+        val fCurrTimeThroughLoop = fmodf(fElapsedTime, fLoopDuration)
+
+        val xOffset = cosf(fCurrTimeThroughLoop * fScale) * 0.5f
+        val yOffset = sinf(fCurrTimeThroughLoop * fScale) * 0.5f
+
+        return Pair(xOffset, yOffset)
+    }
+
+    private fun adjustVertexData(fXOffset: Float, fYOffset: Float)
+    {
+        memScoped {
+            val fNewData = allocArray<FloatVar>(vertexPositions.size)
+            val pointer = vertexPositions.getPointer(memScope)
+            (0 until vertexPositions.size).forEach { index ->
+                    fNewData[index] = pointer[index]
+            }
+                var iVertex = 0
+                while (iVertex < vertexPositions.size) {
+                    fNewData[iVertex] += fXOffset
+                    fNewData[iVertex + 1] += fYOffset
+                    iVertex += 4
+                }
+            val glArrayBuffer = GL_ARRAY_BUFFER.toUInt()
+            glBindBuffer!!(glArrayBuffer, positionBufferObject)
+
+            val vertexDataSize = vertexPositions.size.toLong()
+            glBufferSubData!!(glArrayBuffer, 0, vertexDataSize, fNewData.getPointer(memScope))
+            glBindBuffer!!(glArrayBuffer, 0.toUInt())
+        }
+
+
+    }
+
     //Called to update the display.
     //You should call glutSwapBuffers after all of your rendering to display what you rendered.
     //If you need continuous updates of the screen, call glutPostRedisplay() at the end of the function.
     override fun display() {
+        val (fXOffset, fYOffset) = computePositionOffsets()
+        adjustVertexData(fXOffset, fYOffset)
+
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f)
         glClear(GL_COLOR_BUFFER_BIT)
         glUseProgram!!(theProgram)
 
         //Position 0
-        glBindBuffer!!(GL_ARRAY_BUFFER.toUInt(), vertexBufferObject)
+        glBindBuffer!!(GL_ARRAY_BUFFER.toUInt(), positionBufferObject)
         glEnableVertexAttribArray!!(0.toUInt())
         glVertexAttribPointer!!(0.toUInt(), 4, GL_FLOAT.toUInt(), GL_FALSE.toUByte(), 0, null)
 
-        //Position 1
-        glBindBuffer!!(GL_ARRAY_BUFFER.toUInt(), vertexBufferObject2)
-        glEnableVertexAttribArray!!(1.toUInt())
-        glVertexAttribPointer!!(1.toUInt(), 4, GL_FLOAT.toUInt(), GL_FALSE.toUByte(), 0, null)
-
-
         glDrawArrays(GL_TRIANGLES, 0, 3)
-
-
-
 
         glDisableVertexAttribArray!!(0.toUInt())
         glDisableVertexAttribArray!!(1.toUInt())
         glUseProgram!!(0.toUInt())
         glutSwapBuffers()
+        glutPostRedisplay();
     }
 
     //Called whenever the window is resized. The new window size is given, in pixels.
