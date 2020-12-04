@@ -32,7 +32,8 @@ kotlin {
                 //entryPoint = 'Tut1_Hello_Triangle.main'
                 //entryPoint = 'Tut_02_Playing_With_Colors.main'
                 //entryPoint = 'tut_02_playing_with_colors_vertex_colors.main'
-                entryPoint = 'tut_03_opengls_moving_triangle.main'
+                //entryPoint = 'tut_03_opengls_moving_triangle.main'
+                entryPoint = 'tut_03_opengls_moving_triangle_better_way.main'
             }
         }
     }

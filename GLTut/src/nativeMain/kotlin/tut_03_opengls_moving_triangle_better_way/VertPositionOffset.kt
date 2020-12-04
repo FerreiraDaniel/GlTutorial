@@ -1,4 +1,4 @@
-package tut_03_opengls_moving_triangle
+package tut_03_opengls_moving_triangle_better_way
 
 import framework.Framework
 import framework.ITutorial
@@ -12,14 +12,15 @@ import platform.posix.fmodf
 import platform.posix.sinf
 
 @ExperimentalUnsignedTypes
-class CpuPositionOffset : ITutorial {
+class VertPositionOffset : ITutorial {
     private val resourcesFolderName = "resources"
     private val folderName = "Tut 03 OpenGLs Moving Triangle"
     private val subFolderName = "data"
-    private val vertexShaderFileName = "standard.vert"
+    private val vertexShaderFileName = "positionOffset.vert"
     private val fragmentShader = "standard.frag"
 
     var theProgram: GLuint = 0.toUInt()
+    var offsetLocation: GLint = 0
 
     private fun initializeProgram() {
         glewInit()
@@ -46,6 +47,10 @@ class CpuPositionOffset : ITutorial {
 
         theProgram = Framework.createProgram(shaderList)
 
+        memScoped {
+            val offsetCPointer = "offset".cstr.getPointer(memScope)
+            offsetLocation = glGetUniformLocation!!(theProgram, offsetCPointer)
+        }
     }
 
     private val vertexPositions = cValuesOf(
@@ -88,8 +93,7 @@ class CpuPositionOffset : ITutorial {
     }
 
 
-    private fun computePositionOffsets(): Pair<Float, Float>
-    {
+    private fun computePositionOffsets(): Pair<Float, Float> {
         val fLoopDuration = 5.0f
         val fScale = 3.14159f * 2.0f / fLoopDuration
 
@@ -103,43 +107,19 @@ class CpuPositionOffset : ITutorial {
         return Pair(xOffset, yOffset)
     }
 
-    private fun adjustVertexData(fXOffset: Float, fYOffset: Float)
-    {
-        memScoped {
-            val fNewData = allocArray<FloatVar>(vertexPositions.size)
-            val pointer = vertexPositions.getPointer(memScope)
-            (0 until vertexPositions.size).forEach { index ->
-                    fNewData[index] = pointer[index]
-            }
-                var iVertex = 0
-                while (iVertex < vertexPositions.size) {
-                    fNewData[iVertex] += fXOffset
-                    fNewData[iVertex + 1] += fYOffset
-                    iVertex += 4
-                }
-            val glArrayBuffer = GL_ARRAY_BUFFER.toUInt()
-            glBindBuffer!!(glArrayBuffer, positionBufferObject)
-
-            val vertexDataSize = vertexPositions.size.toLong()
-            glBufferSubData!!(glArrayBuffer, 0, vertexDataSize, fNewData.getPointer(memScope))
-            glBindBuffer!!(glArrayBuffer, 0.toUInt())
-        }
-
-
-    }
 
     //Called to update the display.
     //You should call glutSwapBuffers after all of your rendering to display what you rendered.
     //If you need continuous updates of the screen, call glutPostRedisplay() at the end of the function.
     override fun display() {
         val (fXOffset, fYOffset) = computePositionOffsets()
-        adjustVertexData(fXOffset, fYOffset)
 
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f)
         glClear(GL_COLOR_BUFFER_BIT)
         glUseProgram!!(theProgram)
 
-        //Position 0
+        glUniform2f!!(offsetLocation, fXOffset, fYOffset)
+
         glBindBuffer!!(GL_ARRAY_BUFFER.toUInt(), positionBufferObject)
         glEnableVertexAttribArray!!(0.toUInt())
         glVertexAttribPointer!!(0.toUInt(), 4, GL_FLOAT.toUInt(), GL_FALSE.toUByte(), 0, null)
@@ -177,7 +157,7 @@ class CpuPositionOffset : ITutorial {
 
 
     override fun getWindowTitle(): String {
-        return "Tut 03 opengl moving triangle"
+        return "Tut 03 opengl moving triangle, A better way"
     }
 
     override fun defaults(displayMode: Int, width: Int, height: Int): Int {
