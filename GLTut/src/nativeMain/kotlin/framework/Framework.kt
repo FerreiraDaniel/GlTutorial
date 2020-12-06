@@ -133,6 +133,9 @@ class Framework {
             return createShader(eShaderType, shader)
         }
 
+        fun loadShader(eShaderType: Int, filePathList: List<String>) =
+            loadShader(eShaderType.toUInt(), filePathList)
+
         fun createProgram(shaderList: List<GLuint>): GLuint {
             val program = GLUtil.linkProgram(shaderList)
             shaderList.forEach { shader ->
