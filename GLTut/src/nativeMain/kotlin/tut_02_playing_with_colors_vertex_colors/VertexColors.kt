@@ -15,7 +15,7 @@ class VertexColors : ITutorial {
 
     var theProgram: GLuint = 0.toUInt()
 
-    private fun initializeProgram() {
+    private fun initializeProgram(framework: IFramework) {
         glewInit()
 
         val vertexShaderFilePath = listOf(
@@ -32,13 +32,13 @@ class VertexColors : ITutorial {
             fragmentShader
         )
 
-        val glVertexShader = Framework.loadShader(GL_VERTEX_SHADER.toUInt(), vertexShaderFilePath)
-        val glFragmentShader = Framework.loadShader(GL_FRAGMENT_SHADER.toUInt(), fragmentShaderFilePath)
+        val glVertexShader = framework.loadShader(GL_VERTEX_SHADER, vertexShaderFilePath)
+        val glFragmentShader = framework.loadShader(GL_FRAGMENT_SHADER, fragmentShaderFilePath)
 
         val shaderList = listOf(glVertexShader, glFragmentShader)
 
 
-        theProgram = Framework.createProgram(shaderList)
+        theProgram = framework.createProgram(shaderList)
 
     }
 
@@ -82,8 +82,8 @@ class VertexColors : ITutorial {
     }
 
     //Called after the window and OpenGL are initialized. Called exactly once, before the main loop.
-    override fun init() {
-        initializeProgram()
+    override fun init(framework: IFramework) {
+        initializeProgram(framework)
         initializeVertexBuffers()
 
         vao = readUIntValue {

@@ -267,4 +267,18 @@ interface IGLWrapper {
      */
     fun glDisableVertexAttribArray(index: Int)
 
+    /**
+     * Specify the value of a uniform variable for the current program object
+     */
+    fun glUniform2f(location: Int, v0: Float, v1: Float)
+
+
+    /**
+     * @param program Specifies the program object to be queried.
+     * @param name String containing the name of the uniform variable whose location is to be queried.
+     *
+     * @return The location of a uniform variable
+     */
+    fun glGetUniformLocation(program: UInt,  name: String): Int
+
 }

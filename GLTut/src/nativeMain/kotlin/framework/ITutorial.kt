@@ -12,7 +12,7 @@ interface ITutorial {
     fun reshape(w: Int, h: Int)
 
     //Called after the window and OpenGL are initialized. Called exactly once, before the Tut_02_Playing_with_Colors.main loop.
-    fun init()
+    fun init(framework: IFramework)
 
 
     fun display()

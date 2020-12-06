@@ -25,7 +25,7 @@ private fun keyboard(key: UByte, x: Int, y: Int) {
     glutDestroyWindow(x)
 }
 
-class Framework {
+class Framework: IFramework {
 
     private fun registerCallBacks(tutorial: ITutorial, window: Int) {
         currentTutorial = tutorial
@@ -59,15 +59,13 @@ class Framework {
     fun launchTutorial(tutorial: ITutorial) {
         val window = initializeWindow(tutorial)
 
-        tutorial.init()
+        tutorial.init(this)
 
         registerCallBacks(tutorial, window)
 
         glutMainLoop()
     }
 
-
-    companion object {
         private fun shaderTypeToString(shaderType: GLenum): String {
             return when (shaderType) {
                 GL_VERTEX_SHADER.toUInt() -> "vertex"
@@ -128,15 +126,15 @@ class Framework {
         }
 
 
-        fun loadShader(eShaderType: GLenum, filePathList: List<String>): GLuint {
+        private fun loadShader(eShaderType: GLenum, filePathList: List<String>): GLuint {
             val shader = readAllText(filePathList)
             return createShader(eShaderType, shader)
         }
 
-        fun loadShader(eShaderType: Int, filePathList: List<String>) =
+        override fun loadShader(eShaderType: Int, filePathList: List<String>) =
             loadShader(eShaderType.toUInt(), filePathList)
 
-        fun createProgram(shaderList: List<GLuint>): GLuint {
+        override fun createProgram(shaderList: List<GLuint>): GLuint {
             val program = GLUtil.linkProgram(shaderList)
             shaderList.forEach { shader ->
                 glDetachShader!!(program, shader)
@@ -144,7 +142,6 @@ class Framework {
 
             return program
         }
-    }
 
 
 }

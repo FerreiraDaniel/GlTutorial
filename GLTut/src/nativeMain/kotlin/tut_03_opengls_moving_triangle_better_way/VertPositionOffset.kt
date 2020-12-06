@@ -1,9 +1,7 @@
 package tut_03_opengls_moving_triangle_better_way
 
-import framework.Framework
-import framework.ITutorial
-import framework.KeyboardKeys
-import framework.readUIntValue
+import framework.*
+import gl_wrapper.IGLWrapper
 import kotlinx.cinterop.*
 import libgl.*
 import libglut.*
@@ -12,7 +10,7 @@ import platform.posix.fmodf
 import platform.posix.sinf
 
 @ExperimentalUnsignedTypes
-class VertPositionOffset : ITutorial {
+class VertPositionOffset(private val glWrapper: IGLWrapper) : ITutorial {
     private val resourcesFolderName = "resources"
     private val folderName = "Tut 03 OpenGLs Moving Triangle"
     private val subFolderName = "data"
@@ -22,7 +20,7 @@ class VertPositionOffset : ITutorial {
     var theProgram: GLuint = 0.toUInt()
     var offsetLocation: GLint = 0
 
-    private fun initializeProgram() {
+    private fun initializeProgram(framework: IFramework) {
         glewInit()
 
         val vertexShaderFilePath = listOf(
@@ -39,18 +37,15 @@ class VertPositionOffset : ITutorial {
             fragmentShader
         )
 
-        val glVertexShader = Framework.loadShader(GL_VERTEX_SHADER.toUInt(), vertexShaderFilePath)
-        val glFragmentShader = Framework.loadShader(GL_FRAGMENT_SHADER.toUInt(), fragmentShaderFilePath)
+        val glVertexShader = framework.loadShader(GL_VERTEX_SHADER, vertexShaderFilePath)
+        val glFragmentShader = framework.loadShader(GL_FRAGMENT_SHADER, fragmentShaderFilePath)
 
         val shaderList = listOf(glVertexShader, glFragmentShader)
 
 
-        theProgram = Framework.createProgram(shaderList)
+        theProgram = framework.createProgram(shaderList)
 
-        memScoped {
-            val offsetCPointer = "offset".cstr.getPointer(memScope)
-            offsetLocation = glGetUniformLocation!!(theProgram, offsetCPointer)
-        }
+        offsetLocation = glWrapper.glGetUniformLocation(theProgram, "offset")
     }
 
     private val vertexPositions = cValuesOf(
@@ -64,32 +59,26 @@ class VertPositionOffset : ITutorial {
     private var vao: GLuint = 0.toUInt()
 
     private fun initializeVertexBuffer() {
-        positionBufferObject = readUIntValue {
-            glGenBuffers!!(1, it)
-        }
-        val glArrayBuffer = GL_ARRAY_BUFFER.toUInt()
-        glBindBuffer!!(glArrayBuffer, positionBufferObject)
-        memScoped {
-            val vertexDataPointer = vertexPositions.getPointer(memScope)
-            val vertexDataSize = vertexPositions.size.toLong()
-            glBufferData!!(glArrayBuffer, vertexDataSize, vertexDataPointer, GL_STATIC_DRAW.toUInt())
-        }
+        val positionBufferObjects = glWrapper.glGenBuffers(1)
+        positionBufferObject = positionBufferObjects[0]
+        val glArrayBuffer = GL_ARRAY_BUFFER
+        glWrapper.glBindBuffer(glArrayBuffer, positionBufferObject)
+        glWrapper.glBufferData(glArrayBuffer, vertexPositions, GL_STATIC_DRAW)
 
-        glBindBuffer!!(glArrayBuffer, 0.toUInt())
+        glWrapper.glBindBuffer(glArrayBuffer, 0)
     }
 
 
     //Called after the window and OpenGL are initialized. Called exactly once, before the main loop.
-    override fun init() {
-        initializeProgram()
+    override fun init(framework: IFramework) {
+        initializeProgram(framework)
         initializeVertexBuffer()
 
-        vao = readUIntValue {
-            glGenVertexArrays!!(1, it)
-        }
+        val vaos = glWrapper.glGenVertexArrays(1)
+        vao = vaos[0]
 
 
-        glBindVertexArray!!(vao)
+        glWrapper.glBindVertexArray(vao)
     }
 
 
@@ -114,21 +103,20 @@ class VertPositionOffset : ITutorial {
     override fun display() {
         val (fXOffset, fYOffset) = computePositionOffsets()
 
-        glClearColor(0.0f, 0.0f, 0.0f, 0.0f)
-        glClear(GL_COLOR_BUFFER_BIT)
-        glUseProgram!!(theProgram)
+        glWrapper.glClearColor(0.0f, 0.0f, 0.0f, 0.0f)
+        glWrapper.glClear(GL_COLOR_BUFFER_BIT)
+        glWrapper.glUseProgram(theProgram)
 
-        glUniform2f!!(offsetLocation, fXOffset, fYOffset)
+        glWrapper.glUniform2f(offsetLocation, fXOffset, fYOffset)
 
-        glBindBuffer!!(GL_ARRAY_BUFFER.toUInt(), positionBufferObject)
-        glEnableVertexAttribArray!!(0.toUInt())
-        glVertexAttribPointer!!(0.toUInt(), 4, GL_FLOAT.toUInt(), GL_FALSE.toUByte(), 0, null)
+        glWrapper.glBindBuffer(GL_ARRAY_BUFFER, positionBufferObject)
+        glWrapper.glEnableVertexAttribArray(0)
+        glWrapper.glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, null)
 
-        glDrawArrays(GL_TRIANGLES, 0, 3)
+        glWrapper.glDrawArrays(GL_TRIANGLES, 0, 3)
 
-        glDisableVertexAttribArray!!(0.toUInt())
-        glDisableVertexAttribArray!!(1.toUInt())
-        glUseProgram!!(0.toUInt())
+        glWrapper.glDisableVertexAttribArray(0)
+        glWrapper.glUseProgram(0)
         glutSwapBuffers()
         glutPostRedisplay();
     }
@@ -136,7 +124,7 @@ class VertPositionOffset : ITutorial {
     //Called whenever the window is resized. The new window size is given, in pixels.
     //This is an opportunity to call glViewport or glScissor to keep up with the change in size.
     override fun reshape(w: Int, h: Int) {
-        glViewport(0, 0, w, h)
+        glWrapper.glViewport(0, 0, w, h)
     }
 
 

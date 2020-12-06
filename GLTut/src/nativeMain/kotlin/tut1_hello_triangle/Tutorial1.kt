@@ -142,7 +142,7 @@ class Tutorial1(private val glWrapper: IGLWrapper) : ITutorial {
                 "   outputColor = vec4(1.0f, 1.0f, 1.0f, 0.0f);\n" +
                 "}\n"
 
-    private fun initializeProgram(glWrapper: IGLWrapper) {
+    private fun initializeProgram() {
         glewInit()
 
         val glVertexShader = createShader(glWrapper, GL_VERTEX_SHADER, strVertexShader)
@@ -182,8 +182,8 @@ class Tutorial1(private val glWrapper: IGLWrapper) : ITutorial {
     }
 
     //Called after the window and OpenGL are initialized. Called exactly once, before the Tut_02_Playing_with_Colors.main loop.
-    override fun init() {
-        initializeProgram(glWrapper)
+    override fun init(framework: IFramework) {
+        initializeProgram()
         initializeVertexBuffer()
 
         var vertexArray = glWrapper.glGenVertexArrays(1)

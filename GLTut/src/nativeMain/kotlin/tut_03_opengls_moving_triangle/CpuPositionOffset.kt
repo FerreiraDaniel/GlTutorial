@@ -1,9 +1,6 @@
 package tut_03_opengls_moving_triangle
 
-import framework.Framework
-import framework.ITutorial
-import framework.KeyboardKeys
-import framework.readUIntValue
+import framework.*
 import kotlinx.cinterop.*
 import libgl.*
 import libglut.*
@@ -21,7 +18,7 @@ class CpuPositionOffset : ITutorial {
 
     var theProgram: GLuint = 0.toUInt()
 
-    private fun initializeProgram() {
+    private fun initializeProgram(framework: IFramework) {
         glewInit()
 
         val vertexShaderFilePath = listOf(
@@ -38,13 +35,13 @@ class CpuPositionOffset : ITutorial {
             fragmentShader
         )
 
-        val glVertexShader = Framework.loadShader(GL_VERTEX_SHADER.toUInt(), vertexShaderFilePath)
-        val glFragmentShader = Framework.loadShader(GL_FRAGMENT_SHADER.toUInt(), fragmentShaderFilePath)
+        val glVertexShader = framework.loadShader(GL_VERTEX_SHADER, vertexShaderFilePath)
+        val glFragmentShader = framework.loadShader(GL_FRAGMENT_SHADER, fragmentShaderFilePath)
 
         val shaderList = listOf(glVertexShader, glFragmentShader)
 
 
-        theProgram = Framework.createProgram(shaderList)
+        theProgram = framework.createProgram(shaderList)
 
     }
 
@@ -75,8 +72,8 @@ class CpuPositionOffset : ITutorial {
 
 
     //Called after the window and OpenGL are initialized. Called exactly once, before the main loop.
-    override fun init() {
-        initializeProgram()
+    override fun init(framework: IFramework) {
+        initializeProgram(framework)
         initializeVertexBuffer()
 
         vao = readUIntValue {
