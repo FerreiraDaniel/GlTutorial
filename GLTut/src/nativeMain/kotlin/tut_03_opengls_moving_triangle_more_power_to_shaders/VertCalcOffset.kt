@@ -5,9 +5,6 @@ import gl_wrapper.IGLWrapper
 import kotlinx.cinterop.*
 import libgl.*
 import libglut.*
-import platform.posix.cosf
-import platform.posix.fmodf
-import platform.posix.sinf
 
 @ExperimentalUnsignedTypes
 class VertCalcOffset(private val glWrapper: IGLWrapper) : ITutorial {
@@ -18,7 +15,7 @@ class VertCalcOffset(private val glWrapper: IGLWrapper) : ITutorial {
     private val fragmentShader = "standard.frag"
 
     var theProgram: GLuint = 0.toUInt()
-    var offsetLocation: GLint = 0
+    var elapsedTimeUniform: GLint = 0
 
     private fun initializeProgram(framework: IFramework) {
         glewInit()
@@ -45,7 +42,12 @@ class VertCalcOffset(private val glWrapper: IGLWrapper) : ITutorial {
 
         theProgram = framework.createProgram(shaderList)
 
-        offsetLocation = glWrapper.glGetUniformLocation(theProgram, "offset")
+        elapsedTimeUniform = glWrapper.glGetUniformLocation(theProgram, "time")
+
+        val loopDurationUnf = glWrapper.glGetUniformLocation(theProgram, "loopDuration")
+        glWrapper.glUseProgram(theProgram)
+        glWrapper.glUniform1f(loopDurationUnf, 5.0f)
+        glWrapper.glUseProgram(0)
     }
 
     private val vertexPositions = cValuesOf(
@@ -82,32 +84,18 @@ class VertCalcOffset(private val glWrapper: IGLWrapper) : ITutorial {
     }
 
 
-    private fun computePositionOffsets(): Pair<Float, Float> {
-        val fLoopDuration = 5.0f
-        val fScale = 3.14159f * 2.0f / fLoopDuration
-
-        val fElapsedTime = glutGet(GLUT_ELAPSED_TIME) / 1000.0f
-
-        val fCurrTimeThroughLoop = fmodf(fElapsedTime, fLoopDuration)
-
-        val xOffset = cosf(fCurrTimeThroughLoop * fScale) * 0.5f
-        val yOffset = sinf(fCurrTimeThroughLoop * fScale) * 0.5f
-
-        return Pair(xOffset, yOffset)
-    }
 
 
     //Called to update the display.
     //You should call glutSwapBuffers after all of your rendering to display what you rendered.
     //If you need continuous updates of the screen, call glutPostRedisplay() at the end of the function.
     override fun display()  {
-        val (fXOffset, fYOffset) = computePositionOffsets()
-
         glWrapper.glClearColor(0.0f, 0.0f, 0.0f, 0.0f)
         glWrapper.glClear(GL_COLOR_BUFFER_BIT)
         glWrapper.glUseProgram(theProgram)
 
-        glWrapper.glUniform2f(offsetLocation, fXOffset, fYOffset)
+        val elapsedTime = glutGet(GLUT_ELAPSED_TIME) / 1000.0f
+        glWrapper.glUniform1f(elapsedTimeUniform, elapsedTime)
 
         glWrapper.glBindBuffer(GL_ARRAY_BUFFER, positionBufferObject)
         glWrapper.glEnableVertexAttribArray(0)
@@ -118,7 +106,7 @@ class VertCalcOffset(private val glWrapper: IGLWrapper) : ITutorial {
         glWrapper.glDisableVertexAttribArray(0)
         glWrapper.glUseProgram(0)
         glutSwapBuffers()
-        glutPostRedisplay();
+        glutPostRedisplay()
     }
 
     //Called whenever the window is resized. The new window size is given, in pixels.
@@ -145,7 +133,7 @@ class VertCalcOffset(private val glWrapper: IGLWrapper) : ITutorial {
 
 
     override fun getWindowTitle(): String {
-        return "Tut 03 opengl moving triangle, A better way"
+        return "Tut 03 opengl moving triangle, More Power To The Shaders"
     }
 
     override fun defaults(displayMode: Int, width: Int, height: Int): Int {

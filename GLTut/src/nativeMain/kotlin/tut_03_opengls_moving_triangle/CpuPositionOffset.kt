@@ -147,7 +147,7 @@ class CpuPositionOffset : ITutorial {
         glDisableVertexAttribArray!!(1.toUInt())
         glUseProgram!!(0.toUInt())
         glutSwapBuffers()
-        glutPostRedisplay();
+        glutPostRedisplay()
     }
 
     //Called whenever the window is resized. The new window size is given, in pixels.

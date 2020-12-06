@@ -118,7 +118,7 @@ class VertPositionOffset(private val glWrapper: IGLWrapper) : ITutorial {
         glWrapper.glDisableVertexAttribArray(0)
         glWrapper.glUseProgram(0)
         glutSwapBuffers()
-        glutPostRedisplay();
+        glutPostRedisplay()
     }
 
     //Called whenever the window is resized. The new window size is given, in pixels.

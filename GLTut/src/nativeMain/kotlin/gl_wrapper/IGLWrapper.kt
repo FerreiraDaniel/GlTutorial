@@ -270,6 +270,11 @@ interface IGLWrapper {
     /**
      * Specify the value of a uniform variable for the current program object
      */
+    fun glUniform1f(location: Int, v0: Float)
+
+    /**
+     * Specify the value of a uniform variable for the current program object
+     */
     fun glUniform2f(location: Int, v0: Float, v1: Float)
 
 
@@ -280,5 +285,6 @@ interface IGLWrapper {
      * @return The location of a uniform variable
      */
     fun glGetUniformLocation(program: UInt,  name: String): Int
+
 
 }

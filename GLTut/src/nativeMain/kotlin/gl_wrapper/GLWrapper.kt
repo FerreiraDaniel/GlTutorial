@@ -157,6 +157,8 @@ class GLWrapper: IGLWrapper {
         libgl.glDisableVertexAttribArray!!(index.toUInt())
     }
 
+    override fun glUniform1f(location: Int, v0: Float) = libgl.glUniform1f!!(location, v0)
+
     override fun glUniform2f(location: Int, v0: Float, v1: Float) = libgl.glUniform2f!!(location, v0, v1)
 
     override fun glGetUniformLocation(program: UInt, name: String): Int {
