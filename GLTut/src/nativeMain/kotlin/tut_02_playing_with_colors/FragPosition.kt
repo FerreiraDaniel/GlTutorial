@@ -1,20 +1,21 @@
-package Tut_02_Playing_With_Colors
+package tut_02_playing_with_colors
 
 import framework.*
+import gl_wrapper.IGLWrapper
 import kotlinx.cinterop.*
 import libgl.*
 import libglut.*
 
 @ExperimentalUnsignedTypes
-class FragPosition : ITutorial {
+class FragPosition(private val glWrapper: IGLWrapper) : ITutorial {
     private val resourcesFolderName = "resources"
     private val folderName = "Tut 02 Playing with Colors"
     private val subFolderName = "data"
     private val vertexShaderFileName = "FragPosition.vert"
     private val fragmentShader = "FragPosition.frag"
 
-    var theProgram: GLuint = 0.toUInt()
-    var elapsedTimeUniform: GLuint = 0.toUInt()
+    var theProgram: UInt = 0.toUInt()
+    var elapsedTimeUniform: UInt = 0.toUInt()
 
     private fun initializeProgram(framework: IFramework) {
         glewInit()
@@ -52,22 +53,17 @@ class FragPosition : ITutorial {
     )
 
 
-    var positionBufferObject: GLuint = 0.toUInt()
-    var vao: GLuint = 0.toUInt()
+    var positionBufferObject: UInt = 0.toUInt()
+    var vao: UInt = 0.toUInt()
 
     private fun initializeVertexBuffer() {
-        positionBufferObject = readUIntValue {
-            glGenBuffers!!(1, it)
-        }
-        val glArrayBuffer = GL_ARRAY_BUFFER.toUInt()
-        glBindBuffer!!(glArrayBuffer, positionBufferObject)
-        memScoped {
-            val vertexDataPointer = vertexData.getPointer(memScope)
-            val vertexDataSize = vertexData.size.toLong()
-            glBufferData!!(glArrayBuffer, vertexDataSize, vertexDataPointer, GL_STATIC_DRAW.toUInt())
-        }
+        val positionBufferObjects = glWrapper.glGenBuffers(1)
+        positionBufferObject = positionBufferObjects[0]
+        val glArrayBuffer = GL_ARRAY_BUFFER
+        glWrapper.glBindBuffer(glArrayBuffer, positionBufferObject)
+        glWrapper.glBufferData(glArrayBuffer, vertexData, GL_STATIC_DRAW)
 
-        glBindBuffer!!(glArrayBuffer, 0.toUInt())
+        glWrapper.glBindBuffer(glArrayBuffer, 0.toUInt())
     }
 
     //Called after the window and OpenGL are initialized. Called exactly once, before the main loop.
@@ -75,35 +71,34 @@ class FragPosition : ITutorial {
         initializeProgram(framework)
         initializeVertexBuffer()
 
-        vao = readUIntValue {
-            glGenVertexArrays!!(1, it)
-        }
+        val vaos = glWrapper.glGenVertexArrays(1)
+        vao = vaos[0]
 
 
-        glBindVertexArray!!(vao)
+        glWrapper.glBindVertexArray(vao)
     }
 
     //Called to update the display.
     //You should call glutSwapBuffers after all of your rendering to display what you rendered.
     //If you need continuous updates of the screen, call glutPostRedisplay() at the end of the function.
     override fun display() {
-        glClearColor(0.0f, 0.0f, 0.0f, 0.0f)
-        glClear(GL_COLOR_BUFFER_BIT)
-        glUseProgram!!(theProgram)
-        glBindBuffer!!(GL_ARRAY_BUFFER.toUInt(), positionBufferObject)
-        glEnableVertexAttribArray!!(0.toUInt())
-        glVertexAttribPointer!!(0.toUInt(), 4, GL_FLOAT.toUInt(), GL_FALSE.toUByte(), 0, null)
+        glWrapper.glClearColor(0.0f, 0.0f, 0.0f, 0.0f)
+        glWrapper.glClear(GL_COLOR_BUFFER_BIT)
+        glWrapper.glUseProgram(theProgram)
+        glWrapper.glBindBuffer(GL_ARRAY_BUFFER, positionBufferObject)
+        glWrapper.glEnableVertexAttribArray(0.toUInt())
+        glWrapper.glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, null)
 
-        glDrawArrays(GL_TRIANGLES, 0, 3)
-        glDisableVertexAttribArray!!(0.toUInt())
-        glUseProgram!!(0.toUInt())
+        glWrapper.glDrawArrays(GL_TRIANGLES, 0, 3)
+        glWrapper.glDisableVertexAttribArray(0)
+        glWrapper.glUseProgram(0.toUInt())
         glutSwapBuffers()
     }
 
     //Called whenever the window is resized. The new window size is given, in pixels.
 //This is an opportunity to call glViewport or glScissor to keep up with the change in size.
     override fun reshape(w: Int, h: Int) {
-        glViewport(0, 0, w, h)
+        glWrapper.glViewport(0, 0, w, h)
     }
 
 

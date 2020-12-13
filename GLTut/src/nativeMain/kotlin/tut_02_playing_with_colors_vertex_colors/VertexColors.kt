@@ -1,12 +1,14 @@
 package tut_02_playing_with_colors_vertex_colors
 
 import framework.*
+import gl_wrapper.GLWrapper
+import gl_wrapper.IGLWrapper
 import kotlinx.cinterop.*
 import libgl.*
 import libglut.*
 
 @ExperimentalUnsignedTypes
-class VertexColors : ITutorial {
+class VertexColors(private val glWrapper: IGLWrapper) : ITutorial {
     private val resourcesFolderName = "resources"
     private val folderName = "Tut 02 Playing with Colors"
     private val subFolderName = "data"
