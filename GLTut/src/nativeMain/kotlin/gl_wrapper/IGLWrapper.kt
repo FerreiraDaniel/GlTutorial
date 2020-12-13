@@ -1,6 +1,7 @@
 package gl_wrapper
 
 import kotlinx.cinterop.COpaquePointer
+import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.CValues
 import kotlinx.cinterop.FloatVarOf
 
@@ -285,6 +286,17 @@ interface IGLWrapper {
      * @return The location of a uniform variable
      */
     fun glGetUniformLocation(program: UInt,  name: String): Int
+
+
+    /**
+     *  Updates a subset of a buffer object's data store
+     *
+     *  @param target Specifies the target to which the buffer object is bound for glBufferSubData
+     *  @param offset Specifies the offset into the buffer object's data store where data replacement will begin, measured in bytes.
+     *  @param size Specifies the size in bytes of the data store region being replaced.
+     *  @param data Specifies a pointer to the new data that will be copied into the data store.
+     */
+    fun glBufferSubData(target: Int, offset: Long, size: Long, data: CPointer<FloatVarOf<Float>>)
 
 
 }

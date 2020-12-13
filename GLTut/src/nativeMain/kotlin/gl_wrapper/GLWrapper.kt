@@ -167,4 +167,8 @@ class GLWrapper: IGLWrapper {
             return libgl.glGetUniformLocation!!(program, offsetCPointer)
         }
     }
+
+    override fun glBufferSubData(target: Int, offset: Long, size: Long, data: CPointer<FloatVarOf<Float>>) {
+        libgl.glBufferSubData!!(target.toUInt(), offset, size, data)
+    }
 }
