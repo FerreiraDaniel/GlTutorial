@@ -1,7 +1,6 @@
 package tut_02_playing_with_colors_vertex_colors
 
 import framework.*
-import gl_wrapper.GLWrapper
 import gl_wrapper.IGLWrapper
 import kotlinx.cinterop.*
 import libgl.*
@@ -15,7 +14,7 @@ class VertexColors(private val glWrapper: IGLWrapper) : ITutorial {
     private val vertexShaderFileName = "VertexColors.vert"
     private val fragmentShader = "VertexColors.frag"
 
-    var theProgram: GLuint = 0.toUInt()
+    var theProgram: UInt = 0.toUInt()
 
     private fun initializeProgram(framework: IFramework) {
         glewInit()
@@ -57,23 +56,18 @@ class VertexColors(private val glWrapper: IGLWrapper) : ITutorial {
     )
 
 
-    private var vertexBufferObject: GLuint = 0.toUInt()
-    private var vertexBufferObject2: GLuint = 0.toUInt()
-    private var vao: GLuint = 0.toUInt()
+    private var vertexBufferObject = 0.toUInt()
+    private var vertexBufferObject2 = 0.toUInt()
+    private var vao = 0.toUInt()
 
-    private fun initializeVertexBuffer(vertexData: CValues<FloatVar>): GLuint {
-        var vertexBufferObject = readUIntValue {
-            glGenBuffers!!(1, it)
-        }
-        val glArrayBuffer = GL_ARRAY_BUFFER.toUInt()
-        glBindBuffer!!(glArrayBuffer, vertexBufferObject)
-        memScoped {
-            val vertexDataPointer = vertexData.getPointer(memScope)
-            val vertexDataSize =vertexData.size.toLong()
-            glBufferData!!(glArrayBuffer, vertexDataSize, vertexDataPointer, GL_STATIC_DRAW.toUInt())
-        }
+    private fun initializeVertexBuffer(vertexData: CValues<FloatVar>): UInt {
+        val vertexBufferObjects = glWrapper.glGenBuffers(1)
+        val vertexBufferObject = vertexBufferObjects[0]
 
-        glBindBuffer!!(glArrayBuffer, 0.toUInt())
+        val glArrayBuffer = GL_ARRAY_BUFFER
+        glWrapper.glBindBuffer(glArrayBuffer, vertexBufferObject)
+        glWrapper.glBufferData(glArrayBuffer, vertexData, GL_STATIC_DRAW)
+        glWrapper.glBindBuffer(glArrayBuffer, 0)
 
         return vertexBufferObject
     }
@@ -88,48 +82,46 @@ class VertexColors(private val glWrapper: IGLWrapper) : ITutorial {
         initializeProgram(framework)
         initializeVertexBuffers()
 
-        vao = readUIntValue {
-            glGenVertexArrays!!(1, it)
-        }
+        val vaos = glWrapper.glGenVertexArrays(1)
+        vao = vaos[0]
 
-
-        glBindVertexArray!!(vao)
+        glWrapper.glBindVertexArray(vao)
     }
 
     //Called to update the display.
     //You should call glutSwapBuffers after all of your rendering to display what you rendered.
     //If you need continuous updates of the screen, call glutPostRedisplay() at the end of the function.
     override fun display() {
-        glClearColor(0.0f, 0.0f, 0.0f, 0.0f)
-        glClear(GL_COLOR_BUFFER_BIT)
-        glUseProgram!!(theProgram)
+        glWrapper.glClearColor(0.0f, 0.0f, 0.0f, 0.0f)
+        glWrapper.glClear(GL_COLOR_BUFFER_BIT)
+        glWrapper.glUseProgram(theProgram)
 
         //Position 0
-        glBindBuffer!!(GL_ARRAY_BUFFER.toUInt(), vertexBufferObject)
-        glEnableVertexAttribArray!!(0.toUInt())
-        glVertexAttribPointer!!(0.toUInt(), 4, GL_FLOAT.toUInt(), GL_FALSE.toUByte(), 0, null)
+        glWrapper.glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject)
+        glWrapper.glEnableVertexAttribArray(0)
+        glWrapper.glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, null)
 
         //Position 1
-        glBindBuffer!!(GL_ARRAY_BUFFER.toUInt(), vertexBufferObject2)
-        glEnableVertexAttribArray!!(1.toUInt())
-        glVertexAttribPointer!!(1.toUInt(), 4, GL_FLOAT.toUInt(), GL_FALSE.toUByte(), 0, null)
+        glWrapper.glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject2)
+        glWrapper.glEnableVertexAttribArray(1)
+        glWrapper.glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, null)
 
 
-        glDrawArrays(GL_TRIANGLES, 0, 3)
+        glWrapper.glDrawArrays(GL_TRIANGLES, 0, 3)
 
 
 
 
-        glDisableVertexAttribArray!!(0.toUInt())
-        glDisableVertexAttribArray!!(1.toUInt())
-        glUseProgram!!(0.toUInt())
+        glWrapper.glDisableVertexAttribArray(0)
+        glWrapper.glDisableVertexAttribArray(1)
+        glWrapper.glUseProgram(0)
         glutSwapBuffers()
     }
 
     //Called whenever the window is resized. The new window size is given, in pixels.
 //This is an opportunity to call glViewport or glScissor to keep up with the change in size.
     override fun reshape(w: Int, h: Int) {
-        glViewport(0, 0, w, h)
+        glWrapper.glViewport(0, 0, w, h)
     }
 
 
