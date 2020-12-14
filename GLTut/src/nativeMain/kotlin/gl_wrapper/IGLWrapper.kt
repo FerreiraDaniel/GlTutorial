@@ -299,4 +299,29 @@ interface IGLWrapper {
     fun glBufferSubData(target: Int, offset: Long, size: Long, data: CPointer<FloatVarOf<Float>>)
 
 
+    /**
+     * enable server-side GL capabilities
+     *
+     * @param cap Specifies a symbolic constant indicating a GL capability.
+     */
+    fun glEnable(glCullFace: Int)
+
+    /**
+     *  Specify whether front- or back-facing facets can be culled
+     *
+     * @param mode Specifies whether front- or back-facing facets are candidates for culling.
+     *          Symbolic constants GL_FRONT, GL_BACK, and GL_FRONT_AND_BACK are accepted.
+     *          The initial value is GL_BACK.
+     */
+    fun glCullFace(mode: Int)
+
+    /**
+     *  Define front- and back-facing polygons
+     *
+     * @param mode Specifies the orientation of front-facing polygons. GL_CW and GL_CCW are accepted.
+     *          The initial value is GL_CCW.
+     */
+    fun glFrontFace(mode: Int)
+
+
 }

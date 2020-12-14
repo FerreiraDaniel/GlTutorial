@@ -171,4 +171,16 @@ class GLWrapper: IGLWrapper {
     override fun glBufferSubData(target: Int, offset: Long, size: Long, data: CPointer<FloatVarOf<Float>>) {
         libgl.glBufferSubData!!(target.toUInt(), offset, size, data)
     }
+
+    override fun glEnable(glCullFace: Int) {
+        libgl.glEnable(glCullFace.toUInt())
+    }
+
+    override fun glCullFace(mode: Int) {
+        libgl.glCullFace(mode.toUInt())
+    }
+
+    override fun glFrontFace(mode: Int) {
+        libgl.glFrontFace(mode.toUInt())
+    }
 }

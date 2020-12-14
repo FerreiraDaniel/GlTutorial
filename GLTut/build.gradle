@@ -30,12 +30,13 @@ kotlin {
         binaries {
             executable {
                 //entryPoint = 'tut1_hello_triangle.main'
-                //entryPoint = 'Tut_02_Playing_With_Colors.main'
+                //entryPoint = 'tut_02_playing_with_colors.main'
                 //entryPoint = 'tut_02_playing_with_colors_vertex_colors.main'
                 //entryPoint = 'tut_03_opengls_moving_triangle.main'
                 //entryPoint = 'tut_03_opengls_moving_triangle_better_way.main'
                 //entryPoint = 'tut_03_opengls_moving_triangle_more_power_to_shaders.main'
-                entryPoint = 'tut_03_opengl_is_moving_triangle_multiple_shaders.main'
+                //entryPoint = 'tut_03_opengl_is_moving_triangle_multiple_shaders.main'
+                entryPoint = 'tut_04_objects_at_rest_otho_cube.main'
             }
         }
     }
