@@ -5,7 +5,8 @@ import gl_wrapper.GLWrapper
 
 
 fun main() {
-    val tutorial = OrthoCube(GLWrapper())
+    val glWrapper = GLWrapper()
+    val tutorial = OrthoCube(glWrapper)
     val framework = Framework()
     framework.launchTutorial(tutorial)
 

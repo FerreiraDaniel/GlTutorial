@@ -10,7 +10,15 @@ import platform.posix.fopen
 
 object FileUtil {
     fun readAllText(filePathList: List<String>): String {
-        val filePath = filePathList.joinToString(separator = "\\")
+        try {
+            return readAllText(filePathList, "\\")
+        } catch (exception: IllegalArgumentException) {
+            return readAllText(filePathList, "//")
+        }
+    }
+
+    fun readAllText(filePathList: List<String>, separator: String): String {
+        val filePath = filePathList.joinToString(separator)
         return readAllText(filePath)
     }
 

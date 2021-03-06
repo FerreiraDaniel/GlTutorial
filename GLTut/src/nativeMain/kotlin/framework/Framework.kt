@@ -5,6 +5,7 @@ import framework.FileUtil.readAllText
 import kotlinx.cinterop.*
 import libgl.*
 import libglut.*
+import platform.GLUT.GLUT_3_2_CORE_PROFILE
 
 private var currentTutorial: ITutorial? = null
 private var currentWindow: Int? = null
@@ -45,12 +46,13 @@ class Framework: IFramework {
         // Display Mode
         val width = 500
         val height = 500
-        var displayMode = GLUT_DOUBLE or GLUT_ALPHA or GLUT_DEPTH or GLUT_STENCIL
+        var displayMode = GLUT_3_2_CORE_PROFILE or GLUT_DOUBLE or GLUT_ALPHA or GLUT_DEPTH or GLUT_STENCIL
         displayMode = tutorial.defaults(displayMode, width, height)
 
         glutInitDisplayMode(displayMode.convert())
         glutInitWindowSize(width, height)
         glutInitWindowPosition(300, 200)
+
 
         // create Window
         return glutCreateWindow(tutorial.getWindowTitle())
@@ -102,8 +104,11 @@ class Framework: IFramework {
             val shader = glCreateShader!!(eShaderType)
 
             memScoped {
-                val glVersion = glGetString(GL_VERSION)!!.toKString()
-                println("Gl version: $glVersion")
+                val glVersion = glGetString(GL_VERSION)?.toKString()
+                if(glVersion != null) {
+                    println("Gl version: $glVersion")
+                }
+
 
                 val strShaderFilePointer = strShaderFile.cstr.getPointer(memScope)
 
