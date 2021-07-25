@@ -5,7 +5,6 @@ import framework.FileUtil.readAllText
 import kotlinx.cinterop.*
 import libgl.*
 import libglut.*
-import platform.GLUT.GLUT_3_2_CORE_PROFILE
 
 private var currentTutorial: ITutorial? = null
 private var currentWindow: Int? = null
@@ -46,7 +45,7 @@ class Framework: IFramework {
         // Display Mode
         val width = 500
         val height = 500
-        var displayMode = GLUT_3_2_CORE_PROFILE or GLUT_DOUBLE or GLUT_ALPHA or GLUT_DEPTH or GLUT_STENCIL
+        var displayMode = GLUT_DOUBLE or GLUT_ALPHA or GLUT_DEPTH or GLUT_STENCIL
         displayMode = tutorial.defaults(displayMode, width, height)
 
         glutInitDisplayMode(displayMode.convert())
