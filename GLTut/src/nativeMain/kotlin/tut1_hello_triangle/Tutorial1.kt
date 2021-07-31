@@ -3,8 +3,10 @@ package tut1_hello_triangle
 import framework.*
 import gl_wrapper.*
 import kotlinx.cinterop.*
-import libgl.*
-import libglut.*
+import libglew.glewInit
+import platform.GLUT.*
+import platform.OpenGL3.*
+import platform.OpenGLCommon.*
 
 class Tutorial1(private val glWrapper: IGLWrapper) : ITutorial {
 

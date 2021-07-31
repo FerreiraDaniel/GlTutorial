@@ -3,8 +3,9 @@ package framework
 
 import framework.FileUtil.readAllText
 import kotlinx.cinterop.*
-import libgl.*
-import libglut.*
+import platform.GLUT.*
+import platform.OpenGL3.*
+import platform.OpenGLCommon.*
 
 private var currentTutorial: ITutorial? = null
 private var currentWindow: Int? = null
@@ -45,7 +46,7 @@ class Framework: IFramework {
         // Display Mode
         val width = 500
         val height = 500
-        var displayMode = GLUT_DOUBLE or GLUT_ALPHA or GLUT_DEPTH or GLUT_STENCIL
+        var displayMode = GLUT_3_2_CORE_PROFILE or GLUT_DOUBLE or GLUT_ALPHA or GLUT_DEPTH or GLUT_STENCIL
         displayMode = tutorial.defaults(displayMode, width, height)
 
         glutInitDisplayMode(displayMode.convert())
@@ -87,11 +88,11 @@ class Framework: IFramework {
             }
             memScoped {
                 val infoLogLength = readIntValue {
-                    glGetShaderiv!!(shader, GL_INFO_LOG_LENGTH.toUInt(), it)
+                    glGetShaderiv(shader, GL_INFO_LOG_LENGTH.toUInt(), it)
                 }
 
                 val strInfoLog = allocArray<GLcharVar>(infoLogLength)
-                glGetShaderInfoLog!!(shader, infoLogLength, null, strInfoLog.getPointer(memScope))
+                glGetShaderInfoLog(shader, infoLogLength, null, strInfoLog.getPointer(memScope))
                 val error = strInfoLog.getPointer(memScope).toKString()
                 val shaderTypeString = shaderTypeToString(shaderType)
                 println("Compile failure in shader:\n$shaderTypeString \n$error")
@@ -100,7 +101,7 @@ class Framework: IFramework {
 
         private fun createShader(eShaderType: GLenum, strShaderFile: String): GLuint {
 
-            val shader = glCreateShader!!(eShaderType)
+            val shader = glCreateShader(eShaderType)
 
             memScoped {
                 val glVersion = glGetString(GL_VERSION)?.toKString()
@@ -113,12 +114,12 @@ class Framework: IFramework {
 
                 val strFileData = listOf(strShaderFilePointer).toCValues().getPointer(MemScope())
 
-                glShaderSource!!(shader, 1, strFileData, null)
+                glShaderSource(shader, 1, strFileData, null)
 
-                glCompileShader!!(shader)
+                glCompileShader(shader)
 
                 val statusPointer = alloc<IntVarOf<Int>>().apply { value = 0 }
-                glGetShaderiv!!(shader, GL_COMPILE_STATUS.toUInt(), statusPointer.ptr)
+                glGetShaderiv(shader, GL_COMPILE_STATUS.toUInt(), statusPointer.ptr)
                 handleCreateShaderCompileIssue(
                     eShaderType,
                     shader,
@@ -141,7 +142,7 @@ class Framework: IFramework {
         override fun createProgram(shaderList: List<GLuint>): GLuint {
             val program = GLUtil.linkProgram(shaderList)
             shaderList.forEach { shader ->
-                glDetachShader!!(program, shader)
+                glDetachShader(program, shader)
             }
 
             return program

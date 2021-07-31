@@ -1,7 +1,7 @@
 package framework
 
-import libgl.GLenum
-import libgl.GLuint
+import platform.OpenGLCommon.GLuint
+
 
 interface IFramework {
     fun loadShader(eShaderType: Int, filePathList: List<String>): GLuint

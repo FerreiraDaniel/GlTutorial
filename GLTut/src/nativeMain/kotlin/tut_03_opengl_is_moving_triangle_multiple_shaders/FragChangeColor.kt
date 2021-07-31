@@ -1,10 +1,12 @@
 package tut_03_opengl_is_moving_triangle_multiple_shaders
 
 import framework.*
-import gl_wrapper.IGLWrapper
+import gl_wrapper.*
 import kotlinx.cinterop.*
-import libgl.*
-import libglut.*
+import libglew.glewInit
+import platform.GLUT.*
+import platform.OpenGL3.*
+import platform.OpenGLCommon.*
 
 @ExperimentalUnsignedTypes
 class FragChangeColor(private val glWrapper: IGLWrapper) : ITutorial {

@@ -1,8 +1,8 @@
 package framework
 
 import kotlinx.cinterop.*
-import libgl.GLcharVar
-import libgl.GLubyteVar
+import platform.OpenGLCommon.*
+
 
 fun CPointer<GLubyteVar>.toKString(): String {
     val nativeString = this

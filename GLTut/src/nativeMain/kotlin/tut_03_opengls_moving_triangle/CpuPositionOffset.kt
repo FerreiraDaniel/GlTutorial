@@ -3,8 +3,10 @@ package tut_03_opengls_moving_triangle
 import framework.*
 import gl_wrapper.IGLWrapper
 import kotlinx.cinterop.*
-import libgl.*
-import libglut.*
+import libglew.glewInit
+import platform.GLUT.*
+import platform.OpenGL3.*
+import platform.OpenGLCommon.*
 import platform.posix.cosf
 import platform.posix.fmodf
 import platform.posix.sinf

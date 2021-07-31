@@ -3,8 +3,10 @@ package tut_03_opengls_moving_triangle_more_power_to_shaders
 import framework.*
 import gl_wrapper.IGLWrapper
 import kotlinx.cinterop.*
-import libgl.*
-import libglut.*
+import libglew.glewInit
+import platform.GLUT.*
+import platform.OpenGL3.*
+import platform.OpenGLCommon.*
 
 @ExperimentalUnsignedTypes
 class VertCalcOffset(private val glWrapper: IGLWrapper) : ITutorial {

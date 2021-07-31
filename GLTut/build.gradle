@@ -21,9 +21,8 @@ kotlin {
     nativeTarget.with {
         compilations.main {
             cinterops {
-                libgl
                 libglu
-                libglut
+                libglew
             }
         }
 

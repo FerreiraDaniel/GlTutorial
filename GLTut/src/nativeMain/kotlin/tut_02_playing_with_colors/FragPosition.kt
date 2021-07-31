@@ -1,10 +1,13 @@
 package tut_02_playing_with_colors
 
 import framework.*
-import gl_wrapper.IGLWrapper
+import gl_wrapper.*
 import kotlinx.cinterop.*
-import libgl.*
-import libglut.*
+import libglew.glewInit
+import platform.GLUT.*
+import platform.OpenGL3.*
+import platform.OpenGLCommon.*
+
 
 @ExperimentalUnsignedTypes
 class FragPosition(private val glWrapper: IGLWrapper) : ITutorial {

@@ -1,8 +1,0 @@
-headers =  glew.h gl.h glext.h
-headerFilter = *
-
-
-compilerOpts.mingw = -I..\\OpenGL_Library\\mingwX64\\include\\GL
-linkerOpts.mingw = -L.\\..\\OpenGL_Library\\mingwX64\\lib -lopengl32 -lglew32
-compilerOpts.osx = -I/usr/local/include/GL
-linkerOpts.osx = -L/usr/lib -L/usr/local/lib -lgl -lglew

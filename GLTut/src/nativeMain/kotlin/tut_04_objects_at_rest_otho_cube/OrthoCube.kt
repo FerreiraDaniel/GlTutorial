@@ -3,8 +3,10 @@ package tut_04_objects_at_rest_otho_cube
 import framework.*
 import gl_wrapper.IGLWrapper
 import kotlinx.cinterop.*
-import libgl.*
-import libglut.*
+import libglew.glewInit
+import platform.GLUT.*
+import platform.OpenGL3.*
+import platform.OpenGLCommon.*
 
 @ExperimentalUnsignedTypes
 class OrthoCube(private val glWrapper: IGLWrapper) : ITutorial {
